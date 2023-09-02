@@ -1,5 +1,6 @@
 package com.tonyk.android.codapizza.ui.pizzaorder
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import java.util.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tonyk.android.codapizza.R
+import com.tonyk.android.codapizza.model.Pizza
 import com.tonyk.android.codapizza.model.Topping
 import com.tonyk.android.codapizza.model.ToppingPlacement
 
@@ -41,6 +43,17 @@ fun PizzaBuilderScreen(
 
 }
 
+private var pizza =
+    Pizza(
+        toppings = mapOf(
+            Topping.Pepperoni to ToppingPlacement.All,
+            Topping.Pineapple to ToppingPlacement.All
+        )
+    )
+    set(value) {
+        Log.d("PizzaBuilderScreen", "Reassigned pizza to $value")
+        field = value
+    }
 
 
 
@@ -54,9 +67,18 @@ private fun ToppingsList(
         items(Topping.values()) { topping ->
             ToppingCell(
                 topping = topping,
-                placement = ToppingPlacement.Left,
+                placement = pizza.toppings[topping],
                 onClickTopping = {
-// TODO
+                    val isOnPizza = pizza.toppings[topping] != null
+                    pizza = pizza.withTopping(
+                        topping = topping,
+                        placement = if (isOnPizza) {
+                            null
+                        } else {
+                            ToppingPlacement.All
+                        }
+                    )
+
                 }
             )
         }
