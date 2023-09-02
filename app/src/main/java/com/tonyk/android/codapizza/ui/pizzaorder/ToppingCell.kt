@@ -42,6 +42,7 @@ fun ToppingCell(
     modifier: Modifier = Modifier,
     onClickTopping: () -> Unit
 ) {
+
     Row (
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
