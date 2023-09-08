@@ -20,37 +20,50 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tonyk.android.codapizza.R
 import com.tonyk.android.codapizza.model.Pizza
+import com.tonyk.android.codapizza.model.Size
 import com.tonyk.android.codapizza.model.Topping
 import com.tonyk.android.codapizza.model.ToppingPlacement
+import java.nio.DoubleBuffer
 import java.text.NumberFormat
 
-@Preview
+
 @Composable
 fun PizzaBuilderScreen(
     modifier: Modifier = Modifier
 ) {
     var pizza by rememberSaveable { mutableStateOf(Pizza()) }
+    var selectedSize by remember { mutableStateOf(Size.LARGE) }
+    var currentPrice by rememberSaveable { mutableStateOf(selectedSize.price) } // Состояние для текущей цены
 
     Column(
         modifier = modifier
     ) {
+        SizeDropdownMenu(
+            sizes = enumValues<Size>().toList(),
+            selectedSize = selectedSize,
+            onSizeSelected = { newSize ->
+                selectedSize = newSize
+                currentPrice = newSize.price + pizza.price
+            },
+            modifier = Modifier.padding(16.dp)
+        )
         ToppingsList(
             pizza = pizza,
-            onEditPizza = { pizza = it },
+            onEditPizza = { pizza = it
+                currentPrice = selectedSize.price + pizza.price
+                          },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f, fill = true)
 
         )
         OrderButton(
-            pizza = pizza,
+            currentPrice = currentPrice,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         )
-
     }
-
 }
 
 
@@ -98,18 +111,18 @@ private fun ToppingsList(
 }
 @Composable
 private fun OrderButton(
-    pizza: Pizza,
+    currentPrice: Double,
     modifier: Modifier = Modifier
 ) {
     Button(
         modifier = modifier,
         onClick = {
-// TODO
+
         }
     ) {
 
         val currencyFormatter = remember { NumberFormat.getCurrencyInstance() }
-        val price = currencyFormatter.format(pizza.price)
+        val price = currencyFormatter.format(currentPrice)
 
         Text(
             text = stringResource(R.string.place_order_button, price)
